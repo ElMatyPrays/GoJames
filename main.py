@@ -2,7 +2,9 @@ import pymysql
 import mysql.connector
 from itertools import cycle
 from baseDeDatos.base_de_datos import baseDeDatos
-from clases.reservas import reserva
+from clases.reservas import Reserva
+from datetime import datetime
+
 
 #BASE DE DATOS
 
@@ -140,10 +142,10 @@ class Login:
 
     def ventana2(self):
         self.ventana2 = Tk()
-        self.ventana2.geometry("400x700")
+        self.ventana2.geometry("600x500")
         self.ventana2.title("Viajes Aventura")
 
-        fondo1 = "#9fbbf3"
+        fondo1 = "#ff6347"
 
         self.frame_superior = Frame(self.ventana2)
         self.frame_superior.configure(bg=fondo1)
@@ -158,67 +160,88 @@ class Login:
 
         self.titulo2 = Label(self.frame_superior,
                              text="Gestion De Destinos",
-                             font=("Calisto MT", 36, "bold"),
+                             font=("Tahoma", 36, "bold"),
                              bg=fondo1)
         self.titulo2.pack(side="top", pady=20)
 
         # AGREGAR DESTINOOO####
-        self.boton_m_destino = Button(self.frame_inferior, text="Agregar Destinos", width=100, font=("Arial", 12),
+        self.boton_m_destino = Button(self.frame_inferior, text="Agregar Destinos", width=100, font=("Helvetica", 12),
                                       command=self.v_a_destino)
         self.boton_m_destino.grid(row=1, column=1, padx=50, pady=10)
 
         # Pasamos la lista destinos a la ventana de modificación
-        self.boton_mod_destino = Button(self.frame_inferior, text="Modificar Destino", width=100, font=("Arial", 12),
+        self.boton_mod_destino = Button(self.frame_inferior, text="Modificar Destino", width=100, font=("Helvetica", 12),
                                         command=lambda: self.v_mod_destino(self.destinos))
         self.boton_mod_destino.grid(row=2, column=1, padx=50, pady=20)
 
         # Botón Ver Paquete Turístico
-        self.boton_paquete = Button(self.frame_inferior, text="Ver Paquete Turístico", width=100, font=("Arial", 12),
+        self.boton_paquete = Button(self.frame_inferior, text="Ver Paquete Turístico", width=100, font=("Helvetica", 12),
                                     command=self.inter_paquete_turistico)
         self.boton_paquete.grid(row=3, column=1, padx=50, pady=30)
 
         self.boton_reservar_pq = Button(self.frame_inferior, text="Reservar Paquete Turístico", width=100,
-                                        font=("Arial", 12), command=self.reservar_paquete)
+                                        font=("Helvetica", 12), command=self.reservar_paquete)
         self.boton_reservar_pq.grid(row=4, column=1, padx=50, pady=40)
 
     ########VENTANA AGREGAR DESTINO##########
 
     def v_a_destino(self):
-        self.v_a_destino = Tk()
-        self.v_a_destino.geometry("400x300")
-        self.v_a_destino.title("Destinos")
+        reserva = Reserva()
+        ventana = Tk()
+        ventana.geometry("500x500")
+        ventana.title("Crear Reserva")
 
-        fondo3 = "#9fbbf3"
+        fondo3 = "#ff6347"
 
-        # Configuración de Frame
-        frame = Frame(self.v_a_destino, bg=fondo3)
+        # Configuración del frame
+        frame = Frame(ventana, bg=fondo3)
         frame.pack(fill="both", expand=True)
 
         # Título
-        titulo = Label(frame, text="Agregar Destino", font=("Helvetica", 18, "bold"), bg=fondo3)
+        titulo = Label(frame, text="Crear Reserva", font=("Tahoma", 20, "bold"), bg=fondo3)
         titulo.pack(pady=10)
 
-        # Entrada para Destino
-        label_destino = Label(frame, text="Destino:", font=("Helvetica", 12), bg=fondo3)
+        # Entrada para RUT del cliente
+        label_rut = Label(frame, text="RUT Cliente:", font=("Helvetica", 12), bg=fondo3)
+        label_rut.pack(pady=5)
+
+        entrada_rut = Entry(frame, font=("Helvetica", 12), width=30)
+        entrada_rut.pack(pady=5)
+
+        # Entrada para Nombre del destino
+        label_destino = Label(frame, text="Nombre Destino:", font=("Helvetica", 12), bg=fondo3)
         label_destino.pack(pady=5)
 
         entrada_destino = Entry(frame, font=("Helvetica", 12), width=30)
         entrada_destino.pack(pady=5)
 
         # Entrada para Fecha
-        label_fecha = Label(frame, text="Fecha:", font=("Helvetica", 12), bg=fondo3)
+        label_fecha = Label(frame, text="Fecha (dd/mm/yyyy):", font=("Helvetica", 12), bg=fondo3)
         label_fecha.pack(pady=5)
 
         entrada_fecha = Entry(frame, font=("Helvetica", 12), width=30)
         entrada_fecha.pack(pady=5)
 
-        # Botón para guardar
-        boton_crear_reserva = Button(frame, text="Crear reserva", font=("Helvetica", 14),
-                               command=lambda: self.guardar_destino(entrada_destino.get(), entrada_fecha.get()))
-        boton_crear_reserva.pack(pady=10)
+        # Función para validar la fecha antes de proceder con la reserva
+        def validar_reserva():
+            try:
+                fecha = entrada_fecha.get()
+                # Validar formato de fecha
+                datetime.strptime(fecha, "%d-%m-%Y")  # Asegura que la fecha esté en formato dd/mm/yyyy
+                reserva.validar_y_guardar_reserva(entrada_rut.get(), entrada_destino.get(), fecha)
+            except ValueError:
+                messagebox.showerror("Error", "El formato de la fecha no es válido. Use dd/mm/yyyy.")
+
+        # Botón para crear reserva
+        boton_crear_reserva = Button(
+            frame, text="Crear Reserva", font=("Helvetica", 14),
+            command=validar_reserva
+        )
+        boton_crear_reserva.pack(pady=20)
+
+        ventana.mainloop()
 
 
-    # adksasdjklasjdaslkd no se
 
     def guardar_destino(self, destino, fecha, texto):
         if destino and fecha and texto:
@@ -247,14 +270,7 @@ class Login:
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error: {e}")
 
-    def ingresar_destino(self):
-        ID_destino = self.entry_i_emp.get()
 
-        crear_reserva = reserva.Crear_reserva_destinos(self, RUT_cliente,ID_destino, fecha)  # Llamar a la función Eliminar_empleado
-
-        # Mostrar mensaje de éxito
-        messagebox.showinfo("Eliminación", "Empleado eliminado correctamente.")
-        self.v_d_emp.destroy()
 
     #######VENTANA MODIFICAR DESTINO##########
 

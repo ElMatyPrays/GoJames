@@ -82,6 +82,19 @@ def baseDeDatos():
                     estado TINYINT(1) NOT NULL DEFAULT 1,
                     PRIMARY KEY (ID_reserva)
                 )
+            """,
+            "reserva_viajes": """
+                CREATE TABLE IF NOT EXISTS reserva_viajes (
+                    ID_reserva INT(11) NOT NULL AUTO_INCREMENT,
+                    RUT_cliente VARCHAR(12) NOT NULL,
+                    ID_destino INT(11) NOT NULL,
+                    fecha VARCHAR(12) NOT NULL,
+                    nombre_destino VARCHAR(45) NOT NULL UNIQUE,
+                    estado TINYINT(1) NOT NULL DEFAULT 1,
+                    PRIMARY KEY (ID_reserva),
+                    FOREIGN KEY (RUT_cliente) REFERENCES cliente(RUT) ON DELETE CASCADE,
+                    FOREIGN KEY (ID_destino) REFERENCES destino(ID_destino) ON DELETE CASCADE
+                )
             """
         }
 
