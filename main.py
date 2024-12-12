@@ -227,7 +227,7 @@ class Login:
             try:
                 fecha = entrada_fecha.get()
                 # Validar formato de fecha
-                datetime.strptime(fecha, "%d-%m-%Y")  # Asegura que la fecha esté en formato dd/mm/yyyy
+                datetime.strptime(fecha, "%d/%m/%Y")  # Asegura que la fecha esté en formato dd/mm/yyyy
                 reserva.validar_y_guardar_reserva(entrada_rut.get(), entrada_destino.get(), fecha)
             except ValueError:
                 messagebox.showerror("Error", "El formato de la fecha no es válido. Use dd/mm/yyyy.")
@@ -397,37 +397,53 @@ class Login:
     ### VENTANA INTERMEDIA DE PAQUETE TURISTICO ###
 
     def inter_paquete_turistico(self):
-        ventana_intermedia = Tk()
-        ventana_intermedia.geometry("400x400")
-        ventana_intermedia.title("Seleccionar Paquete Turístico")
+        self.ventana_intermedia = Tk()
+        self.ventana_intermedia.geometry("400x500")
+        self.ventana_intermedia.title("Seleccionar Paquete Turístico")
+        fondo = "#ff6347"
 
-        fondo2 = "#d4f1f9"
+        # Establecer el color de fondo de la ventana
+        self.ventana_intermedia.configure(bg=fondo)
+
+        # Frame superior
+        self.frame_superior = Frame(self.ventana_intermedia)
+        self.frame_superior.configure(bg=fondo)
+        self.frame_superior.pack(fill="both", expand=True)
+
+        # Frame inferior para los botones
+        self.frame_inferior = Frame(self.ventana_intermedia)
+        self.frame_inferior.configure(bg=fondo)
+        self.frame_inferior.pack(fill="both", expand=True)
+
+        self.frame_inferior.columnconfigure(0, weight=1)
+        self.frame_inferior.columnconfigure(1, weight=1)
+
 
         # Título
-        titulo = Label(ventana_intermedia, text="Selecciona un Paquete Turístico", font=("Calisto MT", 18, "bold"),
-                       bg=fondo2)
+        titulo = Label(self.ventana_intermedia, text="Selecciona un Paquete Turístico", font=("Calisto MT", 18, "bold"),
+                       bg=fondo)
         titulo.pack(pady=20)
 
         # Botón para Paquete Turístico 1
-        boton_paquete1 = Button(ventana_intermedia, text="Paquete Turístico 1", font=("Arial", 14),
+        boton_paquete1 = Button(self.ventana_intermedia, text="Paquete Turístico 1", font=("Arial", 14),
                                 command=self.ver_paquete_turistico1)
         boton_paquete1.pack(pady=10)
 
         # Botón para Paquete Turístico 2
-        boton_paquete2 = Button(ventana_intermedia, text="Paquete Turístico 2", font=("Arial", 14),
+        boton_paquete2 = Button(self.ventana_intermedia, text="Paquete Turístico 2", font=("Arial", 14),
                                 command=self.ver_paquete_turistico2)
         boton_paquete2.pack(pady=20)
 
         # Botón para Paquete Turístico 3
-        boton_paquete3 = Button(ventana_intermedia, text="Paquete Turístico 3", font=("Arial", 14),
+        boton_paquete3 = Button(self.ventana_intermedia, text="Paquete Turístico 3", font=("Arial", 14),
                                 command=self.ver_paquete_turistico3)
         boton_paquete3.pack(pady=30)
 
         # Botón cerrar ventana
-        boton_cerrar = Button(ventana_intermedia, text="Cerrar", font=("Arial", 12), command=ventana_intermedia.destroy)
+        boton_cerrar = Button(self.ventana_intermedia, text="Cerrar", font=("Arial", 12), command=self.ventana_intermedia.destroy)
         boton_cerrar.pack(pady=40)
 
-        ventana_intermedia.mainloop()
+        self.ventana_intermedia.mainloop()
 
     ### Ventana de Ver Paquete Turístico1 ###
     def ver_paquete_turistico1(self):
@@ -435,22 +451,22 @@ class Login:
         ventana_paquete1.geometry("400x500")
         ventana_paquete1.title("Paquete Turístico 2")
 
-        fondo2 = "#d4f1f9"
+        fondo = "#ff6347"
 
         # Frame superior
-        frame_superior = Frame(ventana_paquete1, bg=fondo2)
+        frame_superior = Frame(ventana_paquete1, bg=fondo)
         frame_superior.pack(fill="both", expand=True)
 
         # Frame inferior
-        frame_inferior = Frame(ventana_paquete1, bg=fondo2)
+        frame_inferior = Frame(ventana_paquete1, bg=fondo)
         frame_inferior.pack(fill="both", expand=True)
 
         # Título
-        titulo = Label(frame_superior, text="Paquete Turístico: Islas", font=("Calisto MT", 20, "bold"), bg=fondo2)
+        titulo = Label(frame_superior, text="Paquete Turístico: Islas", font=("Calisto MT", 20, "bold"), bg=fondo)
         titulo.pack(pady=20)
 
         # Lista de destinos
-        titulo_destinos = Label(frame_inferior, text="Destinos incluidos:", font=("Arial", 14), bg=fondo2)
+        titulo_destinos = Label(frame_inferior, text="Destinos incluidos:", font=("Arial", 14), bg=fondo)
         titulo_destinos.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 
         lista_destinos = Listbox(frame_inferior, height=5, width=30, font=("Arial", 12))
@@ -459,7 +475,7 @@ class Login:
             lista_destinos.insert(END, destino)
 
         # Lista de actividades
-        titulo_actividades = Label(frame_inferior, text="Actividades incluidas:", font=("Arial", 14), bg=fondo2)
+        titulo_actividades = Label(frame_inferior, text="Actividades incluidas:", font=("Arial", 14), bg=fondo)
         titulo_actividades.grid(row=2, column=0, padx=10, pady=5, sticky="w")
 
         lista_actividades = Listbox(frame_inferior, height=5, width=30, font=("Arial", 12))
@@ -478,7 +494,7 @@ class Login:
         ventana_paquete1.geometry("600x700")
         ventana_paquete1.title("Detalles del Paquete Turístico")
 
-        fondo2 = "#d4f1f9"
+        fondo2 = "#ff6347"
 
         # Frame superior
         frame_superior = Frame(ventana_paquete1, bg=fondo2)
@@ -544,7 +560,7 @@ class Login:
         ventana_paquete2.geometry("400x500")
         ventana_paquete2.title("Paquete Turístico 2")
 
-        fondo2 = "#d4f1f9"
+        fondo2 = "#ff6347"
 
         # Frame superior
         frame_superior = Frame(ventana_paquete2, bg=fondo2)
@@ -587,7 +603,7 @@ class Login:
         ventana_paquete2.geometry("600x700")
         ventana_paquete2.title("Detalles del Paquete Turístico")
 
-        fondo2 = "#d4f1f9"
+        fondo2 = "#ff6347"
 
         # Frame superior
         frame_superior = Frame(ventana_paquete2, bg=fondo2)
@@ -654,7 +670,7 @@ class Login:
         ventana_paquete3.geometry("400x500")
         ventana_paquete3.title("Paquete Turístico 2")
 
-        fondo2 = "#d4f1f9"
+        fondo2 = "#ff6347"
 
         # Frame superior
         frame_superior = Frame(ventana_paquete3, bg=fondo2)
@@ -697,7 +713,7 @@ class Login:
         ventana_paquete3.geometry("600x700")
         ventana_paquete3.title("Detalles del Paquete Turístico")
 
-        fondo2 = "#d4f1f9"
+        fondo2 = "#ff6347"
 
         # Frame superior
         frame_superior = Frame(ventana_paquete3, bg=fondo2)
@@ -764,7 +780,7 @@ class Login:
         self.reserva.geometry("600x500")
         self.reserva.title("Reservar Paquete Turístico")
 
-        fondo2 = "#f9e1d4"
+        fondo2 = "#ff6347"
 
         # Frame superior
         frame_superior = Frame(self.reserva, bg=fondo2)

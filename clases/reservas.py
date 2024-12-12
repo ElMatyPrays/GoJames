@@ -28,6 +28,7 @@ class Reserva:
                     db='prueba4'
                 )
                 cursor = conexion.cursor()
+                bd = conexion.cursor()
 
                 # Validar si el cliente existe
                 consulta_cliente = "SELECT COUNT(*) FROM cliente WHERE RUT = %s"
@@ -59,10 +60,15 @@ class Reserva:
                 cursor.execute(consulta_reserva, (RUT_cliente, ID_destino, fecha, nombre_destino))
                 conexion.commit()
 
+                # Obtener el ID_reserva generado
+                ID_reserva = cursor.lastrowid
+
+
                 messagebox.showinfo("Reserva Creada", f"Reserva creada exitosamente para:\n"
                                                      f"RUT: {RUT_cliente}\n"
                                                      f"Destino: {nombre_destino}\n"
-                                                     f"Fecha: {fecha}")
+                                                     f"Fecha: {fecha}\n"
+                                                     f"ID_RESERVA: {ID_reserva}")
                 break
 
                 conexion.close()

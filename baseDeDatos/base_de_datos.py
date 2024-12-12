@@ -55,7 +55,8 @@ def baseDeDatos():
                     ID_destino_3 INT(11) NOT NULL,
                     ID_destino_4 INT(11) NOT NULL,
                     ID_destino_5 INT(11) NOT NULL,
-                    PRIMARY KEY (ID_lista_destinos)
+                    PRIMARY KEY (ID_lista_destinos),
+                    UNIQUE KEY (ID_destino_1, ID_destino_2, ID_destino_3, ID_destino_4, ID_destino_5)
                 )
             """,
             "paquete_turistico": """
@@ -89,7 +90,7 @@ def baseDeDatos():
                     RUT_cliente VARCHAR(12) NOT NULL,
                     ID_destino INT(11) NOT NULL,
                     fecha VARCHAR(12) NOT NULL,
-                    nombre_destino VARCHAR(45) NOT NULL UNIQUE,
+                    nombre_destino VARCHAR(45) NOT NULL,
                     estado TINYINT(1) NOT NULL DEFAULT 1,
                     PRIMARY KEY (ID_reserva),
                     FOREIGN KEY (RUT_cliente) REFERENCES cliente(RUT) ON DELETE CASCADE,
