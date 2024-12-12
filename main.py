@@ -217,6 +217,9 @@ class Login:
                                command=lambda: self.guardar_destino(entrada_destino.get(), entrada_fecha.get()))
         boton_crear_reserva.pack(pady=10)
 
+
+        #asdjasdkjasdklasldas
+
     def guardar_destino(self, destino, fecha, texto):
         if destino and fecha and texto:
             messagebox.showinfo("Guardado", f"Destino: {destino}\nFecha: {fecha}\nDetalles: {texto}")
