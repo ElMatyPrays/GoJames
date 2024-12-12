@@ -1,5 +1,6 @@
 import pymysql
 import mysql.connector
+from itertools import cycle
 from baseDeDatos.base_de_datos import baseDeDatos
 from clases.reservas import reserva
 
@@ -26,10 +27,10 @@ class Login:
         self.actividades = ["Actividad 1", "Actividad 2", "Actividad 3", "Actividad 4",
                             "Actividad 5"]  # Lista de actividades
         self.ventana = Tk()
-        self.ventana.geometry("400x700")
+        self.ventana.geometry("400x400")
         self.ventana.title("Login")
 
-        fondo = "#9fbbf3"
+        fondo = "#ff6347"
 
         ##########FRAMES###########
 
@@ -48,7 +49,7 @@ class Login:
 
         self.titulo = Label(self.frame_superior,
                             text="Login",
-                            font=("Calisto MT", 36, "bold"),
+                            font=("Tahoma", 40, "bold"),
                             bg=fondo)
         self.titulo.pack(side="top", pady=20)
 
@@ -56,17 +57,17 @@ class Login:
 
         #########DATOS##############
 
-        self.label_usuario = Label(self.frame_inferior, text="RUT", font=("Arial", 18), bg=fondo, fg="black")
+        self.label_usuario = Label(self.frame_inferior, text="RUT", font=("Helvetica", 18), bg=fondo, fg="black")
         self.label_usuario.grid(row=0, column=0, padx=10, sticky="e")
-        self.entry_usuario = Entry(self.frame_inferior, bd=0, width=14, font=("Arial", 18))
+        self.entry_usuario = Entry(self.frame_inferior, bd=0, width=14, font=("Helvetica", 18))
         self.entry_usuario.grid(row=0, column=1, columnspan=3, padx=5, sticky="w")
 
-        self.label_contraseña = Label(self.frame_inferior, text="Contraseña", font=("Arial", 18), bg=fondo, fg="black")
+        self.label_contraseña = Label(self.frame_inferior, text="Contraseña", font=("Helvetica", 18), bg=fondo, fg="black")
         self.label_contraseña.grid(row=1, column=0, padx=10, sticky="e")
-        self.entry_contraseña = Entry(self.frame_inferior, bd=0, width=14, font=("Arial", 18), show="●")
+        self.entry_contraseña = Entry(self.frame_inferior, bd=0, width=14, font=("Helvetica", 18), show="●")
         self.entry_contraseña.grid(row=1, column=1, columnspan=3, padx=5, sticky="w")
 
-        self.boton_ingresar = Button(self.frame_inferior, text="Ingresar", width=16, font=("Arial", 12),
+        self.boton_ingresar = Button(self.frame_inferior, text="Ingresar", width=16, font=("Helvetica", 12),
                                      command=self.entrar)
         self.boton_ingresar.grid(row=2, column=1, pady=35)
 
@@ -83,9 +84,30 @@ class Login:
                 messagebox.showwarning("Campo Vacío", "El campo de RUT no puede estar vacío.")
                 break
 
-                # Verificar el formato del RUT (dígitos, guión, y dígito verificador)
+            if not contraseña:
+                messagebox.showwarning("Campo Vacío", "El campo Contraseña no puede estar vacío.")
+                break
+
+
             if not re.match(r'^\d{1,8}-[\dkK]$', rut):
                 messagebox.showwarning("Formato Inválido", "El RUT debe tener el formato 12345678-K.")
+                break
+
+                # Separar el cuerpo del RUT y el dígito verificador
+            cuerpo, dv = rut.split('-')
+            dv = dv.upper()  # Convertir el dígito verificador a mayúscula si es necesario
+
+            # Calcular el dígito verificador esperado
+            reversed_digits = map(int, reversed(cuerpo))
+            factors = cycle(range(2, 8))
+            suma = sum(d * f for d, f in zip(reversed_digits, factors))
+            dv_calculado = str((-suma) % 11)
+            if dv_calculado == '10':
+                dv_calculado = 'K'
+
+            # Comparar el dígito verificador ingresado con el calculado
+            if dv != dv_calculado:
+                messagebox.showwarning("RUT Incorrecto", "El RUT ingresado no es válido.")
                 break
 
             try:
@@ -101,9 +123,11 @@ class Login:
                 if resultado:
                     self.ventana.destroy()
                     self.ventana2()
-                else:
+                    break
+
+                elif not resultado:
                     messagebox.showwarning("RUT No Encontrado", f"No existe un usuario con el RUT: {rut}.")
-                    conexion.close()
+                    break
 
             except Exception as e:
                 messagebox.showerror("Error", f"Error al verificar el RUT: {e}")
@@ -111,16 +135,6 @@ class Login:
 
             conexion.close()
 
-    #def entrar(self):
-     #   nombre = self.entry_usuario.get()
-       # contra = self.entry_contraseña.get()
-
-        #if nombre == "Ezpi" and contra == "1234":
-         #   messagebox.showinfo("Acceso Correcto ", " Has iniciado correctamente")
-          #  self.ventana.destroy()
-           # self.ventana2()
-        #else:
-        #    messagebox.showinfo("Acceso Denegado ", " Intentelo Nuevamente")
 
     ###VENTANA2###
 
@@ -171,49 +185,46 @@ class Login:
 
     def v_a_destino(self):
         self.v_a_destino = Tk()
-        self.v_a_destino.geometry("850x900")  # Ampliamos la ventana para incluir la lista
+        self.v_a_destino.geometry("400x300")
         self.v_a_destino.title("Destinos")
 
         fondo3 = "#9fbbf3"
 
-        # Frame superior
-        self.frame_superior = Frame(self.v_a_destino)
-        self.frame_superior.configure(bg=fondo3)
-        self.frame_superior.pack(fill="both", expand=True)
-
-        # Frame inferior para los botones
-        self.frame_inferior = Frame(self.v_a_destino)
-        self.frame_inferior.configure(bg=fondo3)
-        self.frame_inferior.pack(fill="both", expand=True)
-
-        self.frame_inferior.columnconfigure(0, weight=1)
-        self.frame_inferior.columnconfigure(1, weight=1)
+        # Configuración de Frame
+        frame = Frame(self.v_a_destino, bg=fondo3)
+        frame.pack(fill="both", expand=True)
 
         # Título
-        self.titulo_c_emp = Label(self.frame_superior, text="Destinos", font=("Calisto MT", 36, "bold"), bg=fondo3, )
-        self.titulo_c_emp.pack(side="top", pady=20)
+        titulo = Label(frame, text="Agregar Destino", font=("Helvetica", 18, "bold"), bg=fondo3)
+        titulo.pack(pady=10)
 
-        # Frame para la lista de destinos y scroll
-        self.frame_lista = Frame(self.v_a_destino)
-        self.frame_lista.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+        # Entrada para Destino
+        label_destino = Label(frame, text="Destino:", font=("Helvetica", 12), bg=fondo3)
+        label_destino.pack(pady=5)
 
-        # Scrollbar
-        self.scrollbar = Scrollbar(self.frame_lista)
-        self.scrollbar.pack(side="right", fill="y")
+        entrada_destino = Entry(frame, font=("Helvetica", 12), width=30)
+        entrada_destino.pack(pady=5)
 
-        # Lista de destinos con fechas
-        self.lista_destinos = Listbox(self.frame_lista, height=15, width=50, font=("Arial", 14),
-                                      yscrollcommand=self.scrollbar.set)
-        self.lista_destinos.pack(side="left", fill="both", expand=True)
-        self.scrollbar.config(command=self.lista_destinos.yview)
+        # Entrada para Fecha
+        label_fecha = Label(frame, text="Fecha:", font=("Helvetica", 12), bg=fondo3)
+        label_fecha.pack(pady=5)
+
+        entrada_fecha = Entry(frame, font=("Helvetica", 12), width=30)
+        entrada_fecha.pack(pady=5)
+
+        # Botón para guardar
+        boton_crear_reserva = Button(frame, text="Crear reserva", font=("Helvetica", 14),
+                               command=lambda: self.guardar_destino(entrada_destino.get(), entrada_fecha.get()))
+        boton_crear_reserva.pack(pady=10)
 
         # Función para agregar destinos y fechas a la lista
-        def agregar_a_lista(destino, fecha):
+        def agregar_a_lista(destino, fecha, loop_index):
             if not self.validar_fecha(fecha):  # Llamada al método validar_fecha
                 messagebox.showerror("Error", "El formato de la fecha es incorrecto. Use dd/mm/yyyy.")
                 return
             destino_fecha = f"{destino} - Fecha: {fecha}"
             self.lista_destinos.insert(END, destino_fecha)
+            self.datos_destinos.append((destino, fecha, loop_index))
 
         # Destinos con botones y campos de fecha
         destinos = [
@@ -245,7 +256,7 @@ class Login:
 
             # Botón para agregar destino con fecha
             boton = Button(self.frame_inferior, text="Agregar", font=("Arial", 14),
-                           command=lambda d=destino, e=entry_fecha: agregar_a_lista(d, e.get()), )
+                           command=lambda d=destino, e=entry_fecha, idx=i: agregar_a_lista(d, e.get(), idx ))
             boton.grid(row=i, column=3, padx=10, sticky="w")
 
         # Botón para eliminar el destino seleccionado
@@ -257,7 +268,7 @@ class Login:
 
         # Botón Finalizar
         self.boton_ingresar2 = Button(
-            self.frame_inferior, text="Agregar Reserva", width=16, font=("Arial", 12), command=self.finalizar
+            self.frame_inferior, text="Agregar Reserva", width=16, font=("Arial", 12), command=self.ingresar_destino
         )
         self.boton_ingresar2.grid(row=7, column=1, pady=35)
 
@@ -284,14 +295,18 @@ class Login:
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error: {e}")
 
-    def ingresar_destino(self):
-        ID_destino = self.entry_i_emp.get()
 
-        crear_reserva = reserva.Crear_reserva_destinos(self, RUT_cliente,ID_destino, fecha)  # Llamar a la función Eliminar_empleado
+
+    def ingresar_destino(self):
+        RUT_cliente = self.rut
+        for destino, fecha, loop_index in self.datos_destinos:
+            reserva.Crear_reserva_destinos(self, RUT_cliente,destino + 1, fecha)
 
         # Mostrar mensaje de éxito
-        messagebox.showinfo("Eliminación", "Empleado eliminado correctamente.")
+        messagebox.showinfo("Reserva", "Reserva creada correctamente.")
         self.v_d_emp.destroy()
+
+
 
     #######VENTANA MODIFICAR DESTINO##########
 
