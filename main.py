@@ -1,7 +1,7 @@
 import pymysql
 import mysql.connector
 from baseDeDatos.base_de_datos import baseDeDatos
-
+from clases.reservas import reserva
 
 #BASE DE DATOS
 
@@ -17,6 +17,7 @@ baseDeDatos()
 from tkinter import Tk, Label, Button, Entry, Frame, messagebox, mainloop, Listbox, END, Scrollbar
 from PIL import Image, ImageTk
 import re
+
 
 
 class Login:
@@ -51,13 +52,11 @@ class Login:
                             bg=fondo)
         self.titulo.pack(side="top", pady=20)
 
-        ###########IMAGEN#####################
-
 
 
         #########DATOS##############
 
-        self.label_usuario = Label(self.frame_inferior, text="Usuario", font=("Arial", 18), bg=fondo, fg="black")
+        self.label_usuario = Label(self.frame_inferior, text="RUT", font=("Arial", 18), bg=fondo, fg="black")
         self.label_usuario.grid(row=0, column=0, padx=10, sticky="e")
         self.entry_usuario = Entry(self.frame_inferior, bd=0, width=14, font=("Arial", 18))
         self.entry_usuario.grid(row=0, column=1, columnspan=3, padx=5, sticky="w")
@@ -76,15 +75,52 @@ class Login:
         mainloop()
 
     def entrar(self):
-        nombre = self.entry_usuario.get()
-        contra = self.entry_contraseña.get()
+        while True:
+            rut = self.entry_usuario.get()
+            contraseña = self.entry_contraseña.get()
 
-        if nombre == "Ezpi" and contra == "1234":
-            messagebox.showinfo("Acceso Correcto ", " Has iniciado correctamente")
-            self.ventana.destroy()
-            self.ventana2()
-        else:
-            messagebox.showinfo("Acceso Denegado ", " Intentelo Nuevamente")
+            if not rut:
+                messagebox.showwarning("Campo Vacío", "El campo de RUT no puede estar vacío.")
+                break
+
+                # Verificar el formato del RUT (dígitos, guión, y dígito verificador)
+            if not re.match(r'^\d{1,8}-[\dkK]$', rut):
+                messagebox.showwarning("Formato Inválido", "El RUT debe tener el formato 12345678-K.")
+                break
+
+            try:
+                # Conectar a la base de datos
+                conexion = pymysql.connect(host='localhost', user='root', password='', db='prueba4')
+                cursor = conexion.cursor()
+
+                # Validar si el usuario existe
+                consulta_estado = "SELECT * FROM cliente WHERE RUT = %s AND password_cliente = %s"
+                cursor.execute(consulta_estado, (rut,contraseña))
+                resultado = cursor.fetchone()
+
+                if resultado:
+                    self.ventana.destroy()
+                    self.ventana2()
+                else:
+                    messagebox.showwarning("RUT No Encontrado", f"No existe un usuario con el RUT: {rut}.")
+                    conexion.close()
+
+            except Exception as e:
+                messagebox.showerror("Error", f"Error al verificar el RUT: {e}")
+                break
+
+            conexion.close()
+
+    #def entrar(self):
+     #   nombre = self.entry_usuario.get()
+       # contra = self.entry_contraseña.get()
+
+        #if nombre == "Ezpi" and contra == "1234":
+         #   messagebox.showinfo("Acceso Correcto ", " Has iniciado correctamente")
+          #  self.ventana.destroy()
+           # self.ventana2()
+        #else:
+        #    messagebox.showinfo("Acceso Denegado ", " Intentelo Nuevamente")
 
     ###VENTANA2###
 
@@ -181,13 +217,13 @@ class Login:
 
         # Destinos con botones y campos de fecha
         destinos = [
-            "Destino 1",
-            "Destino 2",
-            "Destino 3",
-            "Destino 4",
-            "Destino 5",
-            "Destino 6",
-            "Destino 7",
+            "Madrid",
+            "Barcelona",
+            "Roma",
+            "Paris",
+            "Milan",
+            "Berlin",
+            "Londres"
         ]
 
         self.fecha_entries = []  # Lista para almacenar las entradas de fecha
@@ -248,34 +284,14 @@ class Login:
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error: {e}")
 
-    def finalizar(self):
-        # Acción al hacer clic en Finalizar
-        print("Destinos agregados:")
-        destinos_agregados = []  # Lista para almacenar los destinos y fechas
+    def ingresar_destino(self):
+        ID_destino = self.entry_i_emp.get()
 
-        for destino in self.lista_destinos.get(0, END):
-            print(destino)
-            destinos_agregados.append(destino)
+        crear_reserva = reserva.Crear_reserva_destinos(self, RUT_cliente,ID_destino, fecha)  # Llamar a la función Eliminar_empleado
 
-        # Espacio para guardar en la base de datos
-        try:
-            # Aquí puedes incluir tu lógica para conectarte y guardar en la base de datos
-            # Por ejemplo:
-            # conexion = tu_metodo_conexion()
-            # cursor = conexion.cursor()
-            # for destino in destinos_agregados:
-            #     consulta = "INSERT INTO tu_tabla (destino, fecha) VALUES (%s, %s)"
-            #     valores = destino.split(" - Fecha: ")
-            #     cursor.execute(consulta, valores)
-            # conexion.commit()
-            print("Datos guardados en la base de datos correctamente.")
-        except Exception as e:
-            messagebox.showerror("Error", f"No se pudieron guardar los datos: {e}")
-            return
-
-        # Mensaje de éxito
-        messagebox.showinfo("", "Destino Agregado Correctamente")
-        self.v_a_destino.destroy()
+        # Mostrar mensaje de éxito
+        messagebox.showinfo("Eliminación", "Empleado eliminado correctamente.")
+        self.v_d_emp.destroy()
 
     #######VENTANA MODIFICAR DESTINO##########
 
@@ -327,13 +343,13 @@ class Login:
 
         # Destinos con botones y campos de fecha
         destinos = [
-            "Destino 1",
-            "Destino 2",
-            "Destino 3",
-            "Destino 4",
-            "Destino 5",
-            "Destino 6",
-            "Destino 7",
+            "Madrid",
+            "Barcelona",
+            "Roma",
+            "Paris",
+            "Milan",
+            "Berlin",
+            "Londres",
         ]
 
         self.fecha_entries = []  # Lista para almacenar las entradas de fecha
@@ -394,30 +410,6 @@ class Login:
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error: {e}")
 
-    def finalizar1(self):
-        # Acción al hacer clic en Finalizar
-        print("Destinos agregados:")
-        destinos_agregados = []  # Lista para almacenar los destinos y fechas
-
-        for destino in self.lista_destinos.get(0, END):
-            print(destino)
-            destinos_agregados.append(destino)
-
-        # Espacio para guardar en la base de datos
-        try:
-            # Aquí puedes incluir tu lógica para conectarte y guardar en la base de datos
-            # Ejemplo:
-            # conexion = tu_metodo_conexion()
-            # cursor = conexion.cursor()
-            # for destino in destinos_agregados:
-            #     consulta = "UPDATE tu_tabla SET fecha = %s WHERE destino = %s"
-            #     valores = destino.split(" - Fecha: ")
-            #     cursor.execute(consulta, (valores[1], valores[0]))
-            # conexion.commit()
-            print("Datos actualizados en la base de datos correctamente.")
-        except Exception as e:
-            messagebox.showerror("Error", f"No se pudieron guardar los datos: {e}")
-            return
 
         # Mensaje de éxito
         messagebox.showinfo("", "Destino Modificado Correctamente")

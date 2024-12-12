@@ -34,7 +34,6 @@ def baseDeDatos():
             "cliente": """
                 CREATE TABLE IF NOT EXISTS cliente (
                     RUT VARCHAR(12) NOT NULL,
-                    nombre_cliente VARCHAR(35) NOT NULL,
                     password_cliente VARCHAR(45) NOT NULL,
                     estado TINYINT(1) NOT NULL DEFAULT 1,
                     PRIMARY KEY (RUT)
@@ -93,6 +92,11 @@ def baseDeDatos():
 
         # Insertar datos base con INSERT IGNORE
         datos_a_insertar = {
+            "rut-y_contra":"""
+                INSERT IGNORE INTO cliente (RUT, password_cliente)
+                VALUES 
+                    ('21880999-5', 'profenosponeel7:)');
+            """,
             "destino": """
                 INSERT IGNORE INTO destino (nombre, costo)
                 VALUES 
